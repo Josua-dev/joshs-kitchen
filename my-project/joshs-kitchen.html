@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Josh's Kitchen — Namibian Recipes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & VARIABLES ─────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sand:#F5E6C8;
+  --sand-dark:#E8D0A0;
+  --dune:#C4956A;
+  --dune-dark:#9B6B42;
+  --earth:#5C3D1E;
+  --earth-deep:#3A2210;
+  --fire:#D45A2A;
+  --fire-light:#E8896A;
+  --fire-pale:#FBF0EB;
+  --savanna:#6B7C3A;
+  --savanna-pale:#EEF2E3;
+  --ink:#2C1A0E;
+  --ink-mid:#7A5535;
+  --ink-faint:#B8956A;
+  --bg:#FCF7EF;
+  --card:#FFFDF9;
+  --border:rgba(196,149,106,0.22);
+  --border-mid:rgba(196,149,106,0.45);
+}
+
+/* ─── BASE ──────────────────────────────────────────── */
+body{
+  background:var(--earth-deep);
+  font-family:'Outfit',sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+}
+
+/* ─── BACKGROUND MOSAIC ─────────────────────────────── */
+#bg-mosaic{
+  position:fixed;top:0;left:0;
+  width:100%;height:100%;
+  z-index:0;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  grid-auto-rows:120px;
+  overflow:hidden;
+  opacity:0.15;
+  pointer-events:none;
+}
+#bg-mosaic img{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+  filter:saturate(1.1);
+}
+
+/* ─── PAGE WRAPPER ──────────────────────────────────── */
+.page{position:relative;z-index:1;}
+
+/* ─── TOP BAR ───────────────────────────────────────── */
+.topbar{
+  background:rgba(30,16,8,0.93);
+  backdrop-filter:blur(12px);
+  padding:0.65rem 2rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid rgba(196,149,106,0.15);
+}
+.topbar-tag{
+  font-size:10px;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--sand-dark);
+  font-weight:500;
+}
+#recipe-counter{color:var(--fire-light);}
+
+/* ─── HERO ──────────────────────────────────────────── */
+.hero{
+  position:relative;
+  overflow:hidden;
+  padding:3rem 2rem 2.5rem;
+  text-align:center;
+}
+.hero-img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:center 40%;
+}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,
+    rgba(30,16,8,0.78) 0%,
+    rgba(58,34,16,0.85) 60%,
+    rgba(30,16,8,0.95) 100%);
+}
+.hero-content{position:relative;}
+.hero-sub{
+  font-size:11px;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:var(--fire-light);
+  font-weight:500;
+  margin-bottom:0.5rem;
+}
+.hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:50px;
+  font-weight:700;
+  line-height:1;
+  color:var(--sand);
+  margin-bottom:0.35rem;
+}
+.hero h1 span{color:var(--fire-light);font-style:italic;}
+.hero-desc{
+  font-size:13px;
+  color:rgba(245,230,200,0.6);
+  font-weight:300;
+  letter-spacing:0.04em;
+}
+.hero-divider{
+  width:50px;height:2px;
+  background:var(--fire);
+  margin:1rem auto 0;
+  border-radius:2px;
+}
+
+/* ─── SEARCH ────────────────────────────────────────── */
+.search-section{
+  padding:1.5rem 2rem 0.5rem;
+  max-width:680px;
+  margin:0 auto;
+}
+.search-row{display:flex;gap:10px;}
+.search-box{
+  flex:1;
+  display:flex;
+  align-items:center;
+  background:rgba(252,247,239,0.95);
+  border:1.5px solid var(--border-mid);
+  border-radius:8px;
+  padding:0 1rem;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  backdrop-filter:blur(8px);
+}
+.search-box:focus-within{
+  border-color:var(--fire);
+  box-shadow:0 0 0 3px var(--fire-pale);
+}
+.search-box input{
+  flex:1;border:none;outline:none;
+  font-family:'Outfit',sans-serif;
+  font-size:14px;color:var(--ink);
+  background:transparent;
+  padding:13px 0;
+}
+.search-box input::placeholder{color:var(--ink-faint);}
+.btn-go{
+  background:var(--fire);color:#fff;
+  border:none;border-radius:8px;
+  padding:13px 22px;
+  font-family:'Outfit',sans-serif;
+  font-size:14px;font-weight:600;
+  cursor:pointer;
+  transition:background 0.18s,transform 0.1s;
+  white-space:nowrap;
+}
+.btn-go:hover{background:var(--dune-dark);}
+.btn-go:active{transform:scale(0.97);}
+
+/* ─── FILTER PILLS ──────────────────────────────────── */
+.filter-row{
+  display:flex;gap:8px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  padding:0.75rem 0 0;
+}
+.filter-row::-webkit-scrollbar{display:none;}
+.fpill{
+  flex-shrink:0;
+  background:rgba(252,247,239,0.12);
+  border:1px solid rgba(196,149,106,0.35);
+  border-radius:6px;
+  padding:6px 14px;
+  font-size:12px;font-weight:500;
+  color:var(--sand-dark);
+  cursor:pointer;
+  transition:all 0.18s;
+  font-family:'Outfit',sans-serif;
+  backdrop-filter:blur(4px);
+}
+.fpill:hover,.fpill.active{
+  background:var(--fire);
+  color:#fff;
+  border-color:var(--fire);
+}
+.fpill.fav-pill.active{
+  background:#e74c6a;
+  border-color:#e74c6a;
+}
+
+/* ─── RESULTS INFO ──────────────────────────────────── */
+.results-info{
+  padding:0.6rem 2rem;
+  max-width:680px;
+  margin:0 auto;
+  font-size:12px;
+  color:rgba(245,214,160,0.55);
+}
+.results-info b{color:var(--sand-dark);font-weight:600;}
+
+/* ─── RECIPE GRID ───────────────────────────────────── */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:1.1rem;
+  padding:0.25rem 2rem 3rem;
+  max-width:680px;
+  margin:0 auto;
+}
+.card{
+  background:var(--card);
+  border-radius:12px;
+  border:1.5px solid var(--border);
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform 0.2s,box-shadow 0.2s;
+  animation:fadeUp 0.4s ease both;
+  position:relative;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 14px 36px rgba(0,0,0,0.35);
+}
+.card-img-wrap{
+  height:155px;overflow:hidden;
+  background:var(--sand);position:relative;
+}
+.card-img-wrap img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+  transition:transform 0.4s ease;
+}
+.card:hover .card-img-wrap img{transform:scale(1.07);}
+.card-img-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 50%,rgba(30,16,8,0.45));
+}
+
+/* ─── FAVOURITE BUTTON (CARD) ───────────────────────── */
+.fav-btn{
+  position:absolute;top:9px;right:9px;z-index:5;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(30,16,8,0.55);
+  backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,0.15);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#fff;font-size:14px;
+  transition:transform 0.2s,background 0.2s;
+}
+.fav-btn:hover{transform:scale(1.15);background:rgba(231,76,106,0.7);}
+.fav-btn.active{background:rgba(231,76,106,0.9);border-color:rgba(231,76,106,0.5);}
+
+/* ─── CARD BODY ─────────────────────────────────────── */
+.card-body{padding:0.8rem 0.95rem 0.95rem;}
+.card-tag{
+  font-size:10px;letter-spacing:0.13em;
+  text-transform:uppercase;
+  color:var(--fire);font-weight:600;margin-bottom:3px;
+}
+.card-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;font-weight:600;
+  line-height:1.25;color:var(--ink);margin-bottom:5px;
+}
+.card-meta{display:flex;gap:10px;margin-top:4px;}
+.card-region,.card-time{
+  font-size:11px;
+  display:flex;align-items:center;gap:3px;
+}
+.card-region{color:var(--ink-faint);}
+.card-time{color:var(--savanna);}
+.diff-badge{
+  display:inline-block;
+  font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:4px;margin-top:6px;
+}
+.diff-easy{background:#eef2e3;color:#6B7C3A;}
+.diff-medium{background:#FBF0EB;color:#C4622D;}
+.diff-hard{background:#fce8e8;color:#b93535;}
+
+/* ─── EMPTY STATE ───────────────────────────────────── */
+.empty-state{
+  text-align:center;padding:3rem 2rem;
+  max-width:360px;margin:0 auto;
+}
+.empty-state h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;color:var(--sand);margin-bottom:0.4rem;
+}
+.empty-state p{
+  font-size:13px;color:rgba(245,214,160,0.5);font-weight:300;
+}
+
+/* ─── MODAL ─────────────────────────────────────────── */
+.modal-bg{
+  display:none;position:fixed;inset:0;
+  background:rgba(20,10,4,0.82);
+  z-index:200;
+  align-items:flex-start;justify-content:center;
+  padding:1.5rem 1rem;overflow-y:auto;
+}
+.modal-bg.open{display:flex;}
+.modal{
+  background:var(--bg);border-radius:14px;
+  max-width:660px;width:100%;
+  position:relative;overflow:hidden;margin:auto;
+}
+.modal-hero-wrap{position:relative;}
+.modal-hero-img{width:100%;height:250px;object-fit:cover;display:block;}
+.modal-hero-overlay{
+  position:absolute;bottom:0;left:0;right:0;height:150px;
+  background:linear-gradient(to top,rgba(30,16,8,0.92),transparent);
+}
+.modal-header-info{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:1.25rem 1.5rem;
+  display:flex;align-items:flex-end;justify-content:space-between;
+}
+.modal-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.4rem;}
+.mbadge{
+  font-size:10px;font-weight:600;letter-spacing:0.1em;
+  text-transform:uppercase;padding:4px 11px;border-radius:4px;
+}
+.mbadge-fire{background:var(--fire);color:#fff;}
+.mbadge-earth{
+  background:rgba(245,230,200,0.15);color:var(--sand);
+  border:1px solid rgba(245,230,200,0.25);
+}
+.modal-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:700;
+  color:#fff;line-height:1.1;
+  text-shadow:0 1px 4px rgba(0,0,0,0.5);
+}
+.modal-fav-btn{
+  flex-shrink:0;width:38px;height:38px;border-radius:50%;
+  background:rgba(30,16,8,0.5);backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#fff;font-size:18px;
+  transition:all 0.2s;margin-bottom:4px;
+}
+.modal-fav-btn:hover{background:rgba(231,76,106,0.7);transform:scale(1.1);}
+.modal-fav-btn.active{background:#e74c6a;border-color:#e74c6a;}
+.modal-close{
+  position:absolute;top:12px;right:12px;
+  background:rgba(0,0,0,0.4);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:6px;width:32px;height:32px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;z-index:10;
+  transition:background 0.15s;
+}
+.modal-close:hover{background:rgba(0,0,0,0.65);}
+.modal-body{padding:1.5rem;}
+.modal-desc{
+  font-size:13.5px;color:var(--ink-mid);
+  margin-bottom:1.25rem;font-weight:300;line-height:1.6;
+}
+.modal-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px;margin-bottom:1.5rem;
+}
+.stat-card{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:8px;padding:0.7rem;text-align:center;
+}
+.stat-val{
+  font-size:17px;font-weight:600;color:var(--fire);
+  font-family:'Cormorant Garamond',serif;
+}
+.stat-lbl{
+  font-size:10px;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--ink-faint);margin-top:2px;font-weight:500;
+}
+.section-head{
+  font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--fire);font-weight:600;
+  padding-bottom:0.5rem;border-bottom:1px solid var(--border);
+  margin-bottom:0.9rem;display:flex;align-items:center;gap:6px;
+}
+.ing-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:7px;margin-bottom:1.5rem;
+}
+.ing-item{display:flex;align-items:flex-start;gap:7px;font-size:13px;line-height:1.3;}
+.ing-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--fire);margin-top:4px;flex-shrink:0;
+}
+.ing-qty{color:var(--ink-faint);min-width:56px;font-size:12px;}
+.ing-name{color:var(--ink-mid);}
+.steps-list{margin-bottom:1rem;}
+.step-item{
+  display:flex;gap:12px;margin-bottom:1rem;
+  font-size:13.5px;line-height:1.65;color:var(--ink-mid);
+}
+.step-num{
+  flex-shrink:0;width:26px;height:26px;border-radius:50%;
+  background:var(--earth);color:var(--sand);
+  font-size:12px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:2px;
+}
+.tip-box{
+  background:var(--savanna-pale);
+  border-left:3px solid var(--savanna);
+  border-radius:0 8px 8px 0;
+  padding:0.75rem 1rem;
+  font-size:12.5px;line-height:1.6;color:var(--earth);
+}
+.tip-label{
+  font-size:10px;text-transform:uppercase;
+  letter-spacing:0.12em;font-weight:600;
+  color:var(--savanna);margin-bottom:3px;
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────── */
+@media(max-width:500px){
+  .hero h1{font-size:36px;}
+  .grid{grid-template-columns:1fr 1fr;gap:0.75rem;padding:0.25rem 1rem 3rem;}
+  .search-section{padding:1rem 1rem 0.5rem;}
+  .topbar{padding:0.6rem 1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── BACKGROUND FOOD MOSAIC ──────────────────────── -->
+<div id="bg-mosaic"></div>
+
+<!-- ─── PAGE ─────────────────────────────────────────── -->
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-tag">🇳🇦 Namibia &nbsp;·&nbsp; Authentic Flavours</div>
+    <div class="topbar-tag" id="recipe-counter"></div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <!-- 🖼️ Change this src to any hero image URL you like -->
+    <img class="hero-img"
+      src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&auto=format&fit=crop&q=80"
+      alt="Hero food background">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-sub">Welcome to</div>
+      <!-- ✏️ Change the kitchen name here -->
+      <h1>Josh's <span>Kitchen</span></h1>
+      <div class="hero-desc">Namibian recipes — from the coast to the Kalahari</div>
+      <div class="hero-divider"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-section">
+    <div class="search-row">
+      <div class="search-box">
+        <input id="q" type="text" placeholder="Search recipes, ingredients…" autocomplete="off">
+      </div>
+      <button class="btn-go" onclick="doSearch()">Search</button>
+    </div>
+    <div class="filter-row" id="filters"></div>
+  </div>
+
+  <div class="results-info" id="rinfo"></div>
+  <div id="main"></div>
+</div>
+
+<!-- ─── RECIPE MODAL ──────────────────────────────────── -->
+<div class="modal-bg" id="modal" onclick="maybeClose(event)">
+  <div class="modal" id="modal-inner"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────
+// BACKGROUND MOSAIC IMAGES
+// Add or change URLs here to update background food photos
+// ─────────────────────────────────────────────────────────
+const BG_IMAGES = [
+  'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=300&h=120&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&h=120&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&h=120&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1540189549336-e6e99ef71240?w=300&h=120&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1476224203421-74177f19a981?w=300&h=120&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1547592180-85f173990554?w=300&h=120&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=300&h=120&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1565299624946-b28f40a04680?w=300&h=120&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&h=120&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1574484284002-952d92456975?w=300&h=120&auto=format&fit=crop',
+];
+
+// ─────────────────────────────────────────────────────────
+// RECIPES — Add, edit, or remove recipes here.
+// Each recipe needs:
+//   id         : unique number
+//   name       : recipe name (string)
+//   img        : URL to a photo (Unsplash, your own, etc.)
+//   category   : shows in filter pills
+//   region     : Namibian region
+//   time       : cook time string
+//   servings   : number of servings string
+//   difficulty : "Easy" | "Medium" | "Hard"
+//   desc       : short description
+//   ingredients: array of { qty, name }
+//   steps      : array of instruction strings
+//   tip        : chef's tip string
+// ─────────────────────────────────────────────────────────
+const RECIPES = [
+  {
+    id: 1,
+    name: "Kapana",
+    img: "images/kapana.jpg",
+    category: "Street Food",
+    region: "Windhoek",
+    time: "25 min",
+    servings: "4",
+    difficulty: "Easy",
+    desc: "Sizzling grilled beef from Windhoek's Katutura markets — Namibia's most beloved street food.",
+    ingredients: [
+      { qty: "1 kg",     name: "beef chuck, cubed" },
+      { qty: "2 tbsp",   name: "vegetable oil" },
+      { qty: "1 tsp",    name: "salt" },
+      { qty: "1 tsp",    name: "black pepper" },
+      { qty: "1 tsp",    name: "chilli flakes" },
+      { qty: "2 tsp",    name: "garlic powder" },
+      { qty: "1",        name: "lemon, halved" },
+      { qty: "4 slices", name: "white bread" },
+      { qty: "2",        name: "tomatoes, diced" },
+      { qty: "1",        name: "onion, finely chopped" },
+    ],
+    steps: [
+      "Cube beef into 3–4 cm pieces. Pat completely dry — key for a good sear.",
+      "Mix salt, pepper, chilli flakes, and garlic powder. Toss beef generously in the spice mix.",
+      "Heat a cast-iron pan over very high heat until smoking. Add oil.",
+      "Grill beef 3–4 minutes per side until charred and cooked through.",
+      "Squeeze lemon over hot meat immediately off the heat.",
+      "Mix diced tomatoes and onion as a fresh relish. Season with salt.",
+      "Serve Kapana on white bread with the tomato-onion relish piled on top.",
+    ],
+    tip: "At Katutura market they fan the coals vigorously — extreme heat is the secret to authentic smoky Kapana."
+  },
+  {
+    id: 2,
+    name: "Oshifima",
+    img: "images/oshifima.jpg",
+    category: "Staple",
+    region: "Oshiwambo",
+    time: "20 min",
+    servings: "6",
+    difficulty: "Easy",
+    desc: "Stiff maize porridge — the cornerstone of Oshiwambo cuisine, eaten with hands alongside stew or spinach.",
+    ingredients: [
+      { qty: "2 cups", name: "white maize meal" },
+      { qty: "4 cups", name: "water" },
+      { qty: "1 tsp",  name: "salt" },
+      { qty: "½ cup",  name: "extra maize meal for thickening" },
+    ],
+    steps: [
+      "Bring 4 cups of water to a rolling boil. Add salt.",
+      "Slowly pour in 2 cups of maize meal while stirring constantly to avoid lumps.",
+      "Reduce heat to medium-low. Cook 10 minutes, stirring frequently.",
+      "When porridge pulls away from the sides, add extra ½ cup gradually.",
+      "Stir vigorously until very stiff and smooth — should hold its shape.",
+      "Wet your hands and shape into a smooth mound.",
+      "Serve with Ombidi spinach, chicken stew, or fermented milk.",
+    ],
+    tip: "Traditional Oshifima is much stiffer than ordinary porridge. If it flows, add more maize meal and cook longer."
+  },
+  {
+    id: 3,
+    name: "Potjiekos",
+    img: "images/potjiekos.jpg",
+    category: "Traditional Stew",
+    region: "Southern Namibia",
+    time: "3 hrs",
+    servings: "6",
+    difficulty: "Medium",
+    desc: "Slow-cooked cast-iron pot stew layered with game or lamb, root vegetables, and aromatic spices.",
+    ingredients: [
+      { qty: "1.2 kg", name: "lamb shoulder or game meat" },
+      { qty: "3 tbsp", name: "vegetable oil" },
+      { qty: "2",      name: "onions, roughly chopped" },
+      { qty: "4",      name: "garlic cloves, crushed" },
+      { qty: "3",      name: "carrots, sliced" },
+      { qty: "3",      name: "potatoes, quartered" },
+      { qty: "2",      name: "sweet potatoes, cubed" },
+      { qty: "1 cup",  name: "dry red wine" },
+      { qty: "400 ml", name: "beef stock" },
+      { qty: "2 tsp",  name: "ground coriander" },
+      { qty: "1 tsp",  name: "paprika" },
+      { qty: "2",      name: "bay leaves" },
+    ],
+    steps: [
+      "Brown meat in batches in hot oil until deeply caramelised. Remove and set aside.",
+      "Fry onions until golden. Add garlic, coriander, and paprika — cook 2 minutes.",
+      "Return meat to pot. Pour in red wine and scrape up browned bits.",
+      "Add stock and bay leaves. Layer carrots on top of meat. Do not stir.",
+      "Cover and simmer over low heat for 1.5 hours.",
+      "Layer potatoes and sweet potatoes on top. Cook a further 45 minutes.",
+      "Serve straight from the potjie with fresh bread or Oshifima.",
+    ],
+    tip: "The golden rule of potjiekos: never stir after layering the vegetables. Patience is the secret ingredient."
+  },
+  {
+    id: 4,
+    name: "Vetkoek",
+    img: "images/vetkoek.jpg",
+    category: "Baked Goods",
+    region: "Nationwide",
+    time: "45 min",
+    servings: "12",
+    difficulty: "Easy",
+    desc: "Deep-fried dough pillows served sweet with syrup or savoury stuffed with curried mince.",
+    ingredients: [
+      { qty: "3 cups", name: "cake flour" },
+      { qty: "10 g",   name: "instant yeast" },
+      { qty: "1 tsp",  name: "salt" },
+      { qty: "1 tbsp", name: "sugar" },
+      { qty: "1 cup",  name: "warm water" },
+      { qty: "2 tbsp", name: "oil" },
+      { qty: "Oil",    name: "for deep frying" },
+      { qty: "500 g",  name: "beef mince" },
+      { qty: "1",      name: "onion, diced" },
+      { qty: "2 tsp",  name: "curry powder" },
+    ],
+    steps: [
+      "Mix flour, yeast, salt, and sugar. Add warm water and oil into a soft dough.",
+      "Knead 8 minutes until smooth. Cover and rise 40 minutes.",
+      "Brown mince with onion and curry powder. Season and set aside.",
+      "Heat oil in a deep pot to 170°C.",
+      "Pull off golf-ball-sized dough pieces.",
+      "Fry in batches 4–5 minutes until golden brown and hollow-sounding.",
+      "Slice open while hot and fill with curried mince or drizzle with golden syrup.",
+    ],
+    tip: "Test oil temperature with a small dough piece — it should sizzle and rise to the surface within 5 seconds."
+  },
+  {
+    id: 5,
+    name: "Oryx Steak",
+    img: "images/oryx.jpg",
+    category: "Game Meat",
+    region: "Namibian Bush",
+    time: "30 min",
+    servings: "2",
+    difficulty: "Medium",
+    desc: "Tender oryx loin steak with a wild herb crust — celebrating Namibia's prized Kalahari game.",
+    ingredients: [
+      { qty: "2",          name: "oryx loin steaks (200g each)" },
+      { qty: "2 tbsp",     name: "olive oil" },
+      { qty: "1 tsp",      name: "coarse salt" },
+      { qty: "1 tsp",      name: "cracked black pepper" },
+      { qty: "1 tsp",      name: "dried thyme" },
+      { qty: "1 tsp",      name: "dried rosemary" },
+      { qty: "3",          name: "garlic cloves, smashed" },
+      { qty: "2 tbsp",     name: "butter" },
+      { qty: "Juice of ½", name: "lemon" },
+    ],
+    steps: [
+      "Remove steaks from fridge 30 minutes before cooking. Pat dry thoroughly.",
+      "Mix salt, pepper, thyme, and rosemary. Rub all over steaks with olive oil.",
+      "Heat a heavy pan until extremely hot — almost smoking.",
+      "Sear steaks 2–3 minutes per side for medium-rare.",
+      "In the last minute, add butter and smashed garlic. Baste repeatedly.",
+      "Remove from heat, squeeze lemon over, and rest 5 minutes under foil.",
+      "Serve sliced against the grain with roasted sweet potato and a green salad.",
+    ],
+    tip: "Oryx is leaner than beef — cook to medium-rare maximum. Well-done will be tough and dry."
+  },
+  {
+    id: 6,
+    name: "Oshiwambo Chicken Stew",
+    img: "images/chicken.jpg",
+    category: "Traditional",
+    region: "Oshiwambo",
+    time: "1 hr 10 min",
+    servings: "5",
+    difficulty: "Easy",
+    desc: "Rich northern Namibian chicken stew slowly cooked with tomatoes, onions, and aromatic spices.",
+    ingredients: [
+      { qty: "1.5 kg",       name: "chicken pieces, bone-in" },
+      { qty: "3 tbsp",       name: "oil" },
+      { qty: "2",            name: "large onions, diced" },
+      { qty: "4",            name: "tomatoes, chopped" },
+      { qty: "3",            name: "garlic cloves, minced" },
+      { qty: "1 tsp",        name: "ginger, grated" },
+      { qty: "1 tsp",        name: "turmeric" },
+      { qty: "1 tsp",        name: "paprika" },
+      { qty: "½ tsp",        name: "cumin" },
+      { qty: "1 cup",        name: "chicken stock" },
+      { qty: "Fresh coriander", name: "to garnish" },
+    ],
+    steps: [
+      "Season chicken with salt, pepper, and turmeric. Brown in hot oil — 8 minutes. Remove.",
+      "Fry onions until soft and golden. Add garlic and ginger — cook 2 minutes.",
+      "Add paprika, cumin, and chopped tomatoes. Cook until tomatoes break down (8 minutes).",
+      "Return chicken to pot. Pour in chicken stock.",
+      "Cover and simmer on low heat 45 minutes until falling-off-the-bone.",
+      "Uncover and cook 10 more minutes to thicken the sauce.",
+      "Garnish with fresh coriander. Serve with Oshifima or rice.",
+    ],
+    tip: "Bone-in chicken is essential — the marrow enriches the sauce in a way boneless pieces simply cannot."
+  },
+  {
+    id: 7,
+    name: "Boerewors Rolls",
+    img: "images/Boerewors.jpg",
+    category: "Braai",
+    region: "Nationwide",
+    time: "25 min",
+    servings: "4",
+    difficulty: "Easy",
+    desc: "Hand-rolled spiced sausage braai'd over open fire — the heart of every Namibian celebration.",
+    ingredients: [
+      { qty: "800g",  name: "boerewors sausage" },
+      { qty: "4",     name: "hoagie rolls" },
+      { qty: "1",     name: "onion, sliced into rings" },
+      { qty: "2 tbsp",name: "butter" },
+      { qty: "2 tbsp",name: "tomato sauce" },
+      { qty: "1 tbsp",name: "chutney (Mrs Ball's)" },
+      { qty: "Yellow mustard", name: "to serve" },
+    ],
+    steps: [
+      "Light the braai and wait for coals to turn ash-white — no flames.",
+      "Grill boerewors over medium-hot coals 12–15 minutes total, turning frequently.",
+      "Do not prick the sausage — keep all the juices sealed inside.",
+      "Slowly caramelise onion rings in butter over low heat for 15 minutes until golden.",
+      "Toast rolls face-down on the grid for 1 minute.",
+      "Mix tomato sauce and chutney for the classic Namibian boerewors sauce.",
+      "Load boerewors into rolls, pile on onions, and drizzle with sauce and mustard.",
+    ],
+    tip: "The best boerewors has 70% beef and 30% pork fat, with coriander as the dominant spice note."
+  },
+  {
+    id: 8,
+    name: "Namibian Oysters",
+    img: "images/oysters.jpg",
+    category: "Seafood",
+    region: "Swakopmund",
+    time: "15 min",
+    servings: "2",
+    difficulty: "Easy",
+    desc: "Freshly shucked Namibian Pacific oysters with a classic mignonette — among the world's finest cold-water oysters.",
+    ingredients: [
+      { qty: "12",    name: "fresh Namibian oysters" },
+      { qty: "3 tbsp",name: "red wine vinegar" },
+      { qty: "1",     name: "shallot, very finely diced" },
+      { qty: "½ tsp", name: "cracked black pepper" },
+      { qty: "1",     name: "lemon, cut into wedges" },
+      { qty: "Crushed ice", name: "for serving" },
+      { qty: "Tabasco", name: "optional" },
+    ],
+    steps: [
+      "Prepare mignonette: combine vinegar, shallot, and pepper. Rest 15 minutes.",
+      "Spread crushed ice on a large platter.",
+      "Hold each oyster curved-side down with a thick cloth. Insert knife at the hinge.",
+      "Twist firmly to pop open. Slide knife along top shell to sever the muscle.",
+      "Remove top shell. Check for shell fragments.",
+      "Nestle each oyster into the crushed ice.",
+      "Serve with mignonette, lemon wedges, and Tabasco on the side.",
+    ],
+    tip: "Namibian oysters are from the icy Benguela Current — naturally briny and plump. Eat them as fresh as possible."
+  },
+  {
+    id: 9,
+    name: "Mielie Pap & Tomato Bredie",
+    img: "https://images.unsplash.com/photo-1604152135912-04a022e23696?w=600&auto=format&fit=crop&q=80",
+    category: "Comfort Food",
+    region: "Nationwide",
+    time: "50 min",
+    servings: "4",
+    difficulty: "Easy",
+    desc: "Creamy maize porridge paired with a slow-cooked spiced tomato and lamb stew — ultimate Namibian comfort food.",
+    ingredients: [
+      { qty: "2 cups", name: "coarse maize meal" },
+      { qty: "3 cups", name: "water" },
+      { qty: "1 cup",  name: "full cream milk" },
+      { qty: "2 tbsp", name: "butter" },
+      { qty: "600g",   name: "lamb knuckles" },
+      { qty: "1 tin",  name: "chopped tomatoes (400g)" },
+      { qty: "2",      name: "onions, chopped" },
+      { qty: "1 tsp",  name: "cinnamon" },
+      { qty: "1 tsp",  name: "allspice" },
+      { qty: "1 tsp",  name: "brown sugar" },
+    ],
+    steps: [
+      "Brown lamb knuckles in oil over high heat until caramelised on all sides.",
+      "Add onions and cook until soft. Stir in cinnamon, allspice, and brown sugar.",
+      "Add tinned tomatoes. Cover and simmer on very low heat 45 minutes.",
+      "Bring water and salt to a boil. Gradually stir in maize meal.",
+      "Cook stirring often for 10 minutes on medium heat. Add milk and butter.",
+      "Cover on very low heat and cook 15 more minutes without stirring.",
+      "Serve pap in bowls, spooning tomato bredie generously over the top.",
+    ],
+    tip: "Tomato Bredie's flavour improves dramatically the next day — make it ahead and reheat slowly."
+  },
+  {
+    id: 10,
+    name: "Namibian Biltong",
+    img: "images/Biltong.jpg",
+    category: "Snack",
+    region: "Nationwide",
+    time: "5 days",
+    servings: "8",
+    difficulty: "Medium",
+    desc: "Air-dried, spiced beef — Namibia's iconic cured meat snack. A slow craft worth every day of patience.",
+    ingredients: [
+      { qty: "2 kg",   name: "beef topside" },
+      { qty: "4 tbsp", name: "coarse salt" },
+      { qty: "2 tbsp", name: "brown sugar" },
+      { qty: "4 tbsp", name: "coriander seeds, toasted & crushed" },
+      { qty: "2 tsp",  name: "black pepper, cracked" },
+      { qty: "1 tsp",  name: "baking soda" },
+      { qty: "100 ml", name: "brown vinegar" },
+    ],
+    steps: [
+      "Slice beef along the grain into 2.5 cm thick strips. Score each lightly.",
+      "Combine salt, sugar, coriander, pepper, and baking soda.",
+      "Layer strips in a glass dish. Sprinkle spice mix on all sides. Add vinegar and turn to coat.",
+      "Refrigerate 24–36 hours, turning every 12 hours.",
+      "Remove and pat very dry. Thread a hook through one end of each strip.",
+      "Hang in a cool, dry, airy place for 4–5 days.",
+      "Ready when outside is firm and dark but inside has a slight give. Slice thinly.",
+    ],
+    tip: "Coriander seed is non-negotiable in authentic Namibian biltong. Toast your own for the best flavour."
+  },
+  {
+    id: 11,
+    name: "Ombidi Spinach",
+    img: "images/ombidi.jpg",
+    category: "Vegetable Side",
+    region: "Northern Namibia",
+    time: "20 min",
+    servings: "4",
+    difficulty: "Easy",
+    desc: "Traditional wild spinach sautéed with onions — the classic accompaniment to Oshifima.",
+    ingredients: [
+      { qty: "600g",  name: "Swiss chard or spinach" },
+      { qty: "2 tbsp",name: "oil" },
+      { qty: "1",     name: "onion, finely sliced" },
+      { qty: "2",     name: "garlic cloves, sliced" },
+      { qty: "½ tsp", name: "salt" },
+      { qty: "¼ tsp", name: "chilli flakes" },
+    ],
+    steps: [
+      "Wash chard and separate leaves from stems. Chop stems, leave leaves whole.",
+      "Heat oil. Fry chopped stems 3 minutes.",
+      "Add sliced onion and garlic — cook until soft and translucent, about 5 minutes.",
+      "Add spinach in large handfuls, wilting each batch before adding more.",
+      "Season with salt and chilli flakes. Add a splash of water to create steam.",
+      "Cover and cook 3–4 minutes until tender.",
+      "Taste and adjust salt. Serve warm alongside Oshifima or rice.",
+    ],
+    tip: "In northern Namibia, Ombidi is made with wild moringa leaves for extra nutrition — add them if you can find them."
+  },
+  {
+    id: 12,
+    name: "Swakopmund Kingklip",
+    img: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600&auto=format&fit=crop&q=80",
+    category: "Seafood",
+    region: "Swakopmund",
+    time: "30 min",
+    servings: "2",
+    difficulty: "Medium",
+    desc: "Pan-roasted Kingklip fillet from the Namibian Atlantic coast — white, flaky and sublime with lemon butter sauce.",
+    ingredients: [
+      { qty: "2",        name: "kingklip fillets (200g each)" },
+      { qty: "2 tbsp",   name: "olive oil" },
+      { qty: "1 tsp",    name: "salt" },
+      { qty: "½ tsp",    name: "white pepper" },
+      { qty: "1 tsp",    name: "paprika" },
+      { qty: "3 tbsp",   name: "butter" },
+      { qty: "3",        name: "garlic cloves, thinly sliced" },
+      { qty: "Juice of 1",name: "lemon" },
+      { qty: "2 tbsp",   name: "fresh parsley, chopped" },
+    ],
+    steps: [
+      "Pat fillets completely dry. Season both sides with salt, white pepper, and paprika.",
+      "Heat olive oil in a non-stick pan until shimmering.",
+      "Place fillets skin-side down. Press gently to prevent curling. Cook 3–4 minutes undisturbed.",
+      "Flip carefully and cook 2–3 more minutes.",
+      "Remove fish and rest on a warm plate. Reduce heat to medium.",
+      "Add butter and garlic. When golden, add lemon juice and parsley.",
+      "Pour sauce over the fish immediately. Serve with roasted vegetables.",
+    ],
+    tip: "Kingklip is best fresh from Namibian waters. Do not marinate — its clean, delicate flavour should shine through."
+  },
+  {
+    id: 13,
+    name: "Malva Pudding",
+    img: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=600&auto=format&fit=crop&q=80",
+    category: "Dessert",
+    region: "Nationwide",
+    time: "55 min",
+    servings: "8",
+    difficulty: "Easy",
+    desc: "Sticky, spongy baked pudding soaked in a warm cream sauce — the most beloved dessert at every Namibian table.",
+    ingredients: [
+      { qty: "1 cup",   name: "sugar" },
+      { qty: "2",       name: "eggs" },
+      { qty: "1 tbsp",  name: "apricot jam" },
+      { qty: "1½ cups", name: "cake flour" },
+      { qty: "1 tsp",   name: "bicarbonate of soda" },
+      { qty: "Pinch",   name: "salt" },
+      { qty: "1 tbsp",  name: "butter, melted" },
+      { qty: "1 tbsp",  name: "vinegar" },
+      { qty: "1 cup",   name: "milk" },
+      { qty: "1 cup",   name: "fresh cream (sauce)" },
+      { qty: "½ cup",   name: "butter (sauce)" },
+      { qty: "½ cup",   name: "sugar (sauce)" },
+      { qty: "½ cup",   name: "boiling water (sauce)" },
+    ],
+    steps: [
+      "Preheat oven to 180°C. Beat eggs and sugar until light and creamy.",
+      "Add apricot jam and beat well.",
+      "Sift flour, bicarb, and salt. Melt butter, mix with vinegar and milk.",
+      "Fold flour mixture and liquid alternately into the egg mixture.",
+      "Pour into a greased 20x30 cm baking dish. Bake 45 minutes until golden and set.",
+      "Make sauce: melt butter, sugar, and cream together over medium heat until sugar dissolves. Add boiling water.",
+      "Pour hot sauce over the hot pudding the moment it comes out of the oven. Let it absorb. Serve warm.",
+    ],
+    tip: "Pour the sauce over while both the pudding and sauce are piping hot — the pudding needs to soak it up like a sponge."
+  },
+  {
+    id: 14,
+    name: "Sosaties",
+    img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80",
+    category: "Braai",
+    region: "Nationwide",
+    time: "1 hr + marinate",
+    servings: "6",
+    difficulty: "Medium",
+    desc: "Spiced lamb and apricot kebabs marinated overnight in a sweet curry sauce and grilled over open fire.",
+    ingredients: [
+      { qty: "1 kg",   name: "lamb leg, cubed" },
+      { qty: "200g",   name: "dried apricots" },
+      { qty: "2",      name: "onions, quartered" },
+      { qty: "3 tbsp", name: "apricot jam" },
+      { qty: "2 tbsp", name: "curry powder" },
+      { qty: "2 tbsp", name: "brown sugar" },
+      { qty: "3 tbsp", name: "vinegar" },
+      { qty: "2 tbsp", name: "oil" },
+      { qty: "3",      name: "garlic cloves, crushed" },
+      { qty: "Salt & pepper", name: "to taste" },
+    ],
+    steps: [
+      "Mix curry powder, sugar, vinegar, oil, garlic, jam, salt, and pepper to make the marinade.",
+      "Toss lamb cubes in the marinade. Add dried apricots and onion quarters. Mix well.",
+      "Cover and refrigerate overnight — minimum 8 hours.",
+      "Thread lamb, apricots, and onion alternately onto metal skewers.",
+      "Grill over medium-hot coals 10–12 minutes, turning regularly.",
+      "Meanwhile, heat remaining marinade in a small pot for 5 minutes as a basting sauce.",
+      "Baste sosaties while grilling. Serve with pap or rice.",
+    ],
+    tip: "The longer the lamb marinates, the better — 24 hours is ideal. The apricots caramelise beautifully on the braai."
+  },
+  {
+    id: 15,
+    name: "Braaibroodjie",
+    img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&auto=format&fit=crop&q=80",
+    category: "Braai",
+    region: "Nationwide",
+    time: "15 min",
+    servings: "4",
+    difficulty: "Easy",
+    desc: "Grilled cheese, tomato, and onion sandwiches cooked directly on the braai grid — the essential braai sidekick.",
+    ingredients: [
+      { qty: "8 slices", name: "thick white bread" },
+      { qty: "Butter",   name: "for spreading" },
+      { qty: "200g",     name: "mature cheddar, sliced" },
+      { qty: "2",        name: "large tomatoes, thinly sliced" },
+      { qty: "1",        name: "onion, thinly sliced" },
+      { qty: "Chutney (Mrs Ball's)", name: "to spread" },
+      { qty: "Salt & pepper", name: "to taste" },
+    ],
+    steps: [
+      "Butter one side of all 8 bread slices generously.",
+      "On the unbuttered side of 4 slices, spread a thin layer of chutney.",
+      "Layer cheddar slices, then tomato, then onion on top of the chutney. Season.",
+      "Close each sandwich butter-side out on both sides.",
+      "Place on the braai grid over medium coals.",
+      "Grill 3–4 minutes per side, pressing gently with a spatula, until golden and the cheese melts.",
+      "Slice and serve immediately alongside boerewors or sosaties.",
+    ],
+    tip: "Don't skimp on butter — it's what gives the braaibroodjie its crispy, golden crust. Always use Mrs Ball's chutney."
+  },
+  {
+    id: 16,
+    name: "Namibian Fish Cakes",
+    img: "https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=600&auto=format&fit=crop&q=80",
+    category: "Seafood",
+    region: "Walvis Bay",
+    time: "40 min",
+    servings: "4",
+    difficulty: "Easy",
+    desc: "Crispy fried fish cakes from Walvis Bay — made with fresh hake and served with a tangy lemon mayo.",
+    ingredients: [
+      { qty: "500g",  name: "hake or cod fillet, cooked and flaked" },
+      { qty: "2 cups",name: "mashed potato" },
+      { qty: "1",     name: "egg, beaten" },
+      { qty: "3 tbsp",name: "fresh parsley, chopped" },
+      { qty: "2",     name: "spring onions, finely chopped" },
+      { qty: "1 tsp", name: "lemon zest" },
+      { qty: "Salt & pepper", name: "to taste" },
+      { qty: "1 cup", name: "breadcrumbs" },
+      { qty: "Oil",   name: "for frying" },
+      { qty: "½ cup", name: "mayo" },
+      { qty: "Juice of ½", name: "lemon" },
+    ],
+    steps: [
+      "Combine flaked fish, mashed potato, egg, parsley, spring onions, and lemon zest.",
+      "Season well with salt and pepper. Mix until it holds together.",
+      "Shape into 8 patties. Coat each in breadcrumbs, pressing to adhere.",
+      "Refrigerate 20 minutes to firm up.",
+      "Heat oil in a frying pan over medium-high heat.",
+      "Fry fish cakes 3–4 minutes per side until deep golden and crispy.",
+      "Mix mayo with lemon juice for dipping sauce. Serve immediately.",
+    ],
+    tip: "Chilling the shaped fish cakes before frying is essential — it stops them from falling apart in the pan."
+  },
+  {
+    id: 17,
+    name: "Rooibos Milk Tart",
+    img: "https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=600&auto=format&fit=crop&q=80",
+    category: "Dessert",
+    region: "Nationwide",
+    time: "1 hr + chill",
+    servings: "8",
+    difficulty: "Medium",
+    desc: "Silky-smooth custard tart infused with Namibian rooibos tea in a buttery pastry shell.",
+    ingredients: [
+      { qty: "2 cups",  name: "flour" },
+      { qty: "125g",    name: "cold butter, cubed" },
+      { qty: "3 tbsp",  name: "icing sugar" },
+      { qty: "1",       name: "egg yolk" },
+      { qty: "3–4 tbsp",name: "ice water" },
+      { qty: "3 cups",  name: "milk" },
+      { qty: "3",       name: "rooibos teabags" },
+      { qty: "3",       name: "eggs" },
+      { qty: "½ cup",   name: "sugar" },
+      { qty: "3 tbsp",  name: "cornflour" },
+      { qty: "1 tbsp",  name: "butter" },
+      { qty: "Cinnamon",name: "for dusting" },
+    ],
+    steps: [
+      "Make pastry: rub cold butter into flour and icing sugar until crumbly. Add egg yolk and ice water. Chill 30 minutes.",
+      "Roll out pastry and line a 23 cm tart tin. Blind bake at 180°C for 15 minutes.",
+      "Remove weights and bake 5 more minutes until golden.",
+      "Heat milk to just below boiling. Add rooibos teabags and steep 5 minutes. Remove bags.",
+      "Whisk eggs, sugar, and cornflour together until smooth.",
+      "Slowly pour warm rooibos milk into egg mixture, whisking constantly.",
+      "Return to pot over medium heat, stir continuously until thick. Add butter.",
+      "Pour filling into baked shell. Chill 2 hours. Dust generously with cinnamon before serving.",
+    ],
+    tip: "The rooibos steeping time is crucial — 5 minutes gives a delicate floral note. Longer and it becomes bitter."
+  },
+  {
+    id: 18,
+    name: "Omaere (Fermented Milk)",
+    img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&auto=format&fit=crop&q=80",
+    category: "Traditional",
+    region: "Oshiwambo",
+    time: "2 days",
+    servings: "4",
+    difficulty: "Easy",
+    desc: "Traditional Oshiwambo fermented milk — tangy, thick, and cooling. The soul of the northern Namibian kitchen.",
+    ingredients: [
+      { qty: "2 litres", name: "full cream fresh milk" },
+      { qty: "½ cup",    name: "existing Omaere or plain yoghurt (starter)" },
+      { qty: "1",        name: "clean calabash or ceramic pot" },
+    ],
+    steps: [
+      "Gently warm fresh milk to about 30°C — blood temperature, not hot.",
+      "Stir in the starter culture (existing Omaere or plain yoghurt). Mix well.",
+      "Pour into a clean calabash or ceramic pot. Cover with a clean cloth.",
+      "Leave in a warm spot (25–30°C) for 24–48 hours without disturbing.",
+      "After 24 hours, taste. It should be thickened and pleasantly tangy.",
+      "If not tangy enough, leave another 12 hours.",
+      "Serve chilled alongside Oshifima, or drink cold as a refreshing beverage.",
+    ],
+    tip: "In Oshiwambo homes, the calabash is smoked with specific wood before use — this gives authentic Omaere its unique earthy depth."
+  },
+  // ─────────────────────────────────────────────────────
+  // ➕ TO ADD A NEW RECIPE: copy the block above, change
+  //    the id (use 19, 20, etc.) and fill in your data.
+  // ─────────────────────────────────────────────────────
+];
+
+// ─────────────────────────────────────────────────────────
+// APP LOGIC — no need to edit below this line
+// ─────────────────────────────────────────────────────────
+const CATEGORIES = ["All", "★ Favourites", ...new Set(RECIPES.map(r => r.category))];
+let activeFilter = "All", searchTerm = "", favourites = new Set();
+
+// Build background mosaic
+const bgEl = document.getElementById('bg-mosaic');
+for (let i = 0; i < 45; i++) {
+  const img = document.createElement('img');
+  img.src = BG_IMAGES[i % BG_IMAGES.length];
+  img.alt = '';
+  img.loading = 'lazy';
+  bgEl.appendChild(img);
+}
+
+// Recipe counter
+document.getElementById('recipe-counter').textContent = RECIPES.length + " Recipes";
+
+// Build filter pills
+const filtersEl = document.getElementById('filters');
+CATEGORIES.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'fpill' + (c === "All" ? " active" : "") + (c === "★ Favourites" ? " fav-pill" : "");
+  b.textContent = c;
+  b.onclick = () => {
+    document.querySelectorAll('.fpill').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    activeFilter = c;
+    render();
+  };
+  filtersEl.appendChild(b);
+});
+
+// Search
+const qEl = document.getElementById('q');
+qEl.addEventListener('input', () => { searchTerm = qEl.value.toLowerCase(); render(); });
+qEl.addEventListener('keydown', e => e.key === 'Enter' && render());
+function doSearch() { searchTerm = qEl.value.toLowerCase(); render(); }
+
+// Toggle favourite
+function toggleFav(e, id) {
+  e.stopPropagation();
+  favourites.has(id) ? favourites.delete(id) : favourites.add(id);
+  render();
+  const btn = document.querySelector('.modal-fav-btn');
+  if (btn) {
+    btn.classList.toggle('active', favourites.has(id));
+    btn.title = favourites.has(id) ? 'Remove from favourites' : 'Save to favourites';
+    btn.textContent = favourites.has(id) ? '♥' : '♡';
+  }
+}
+
+// Filter
+function getFiltered() {
+  return RECIPES.filter(r => {
+    if (activeFilter === "★ Favourites") return favourites.has(r.id);
+    const matchCat = activeFilter === "All" || r.category === activeFilter;
+    const matchSearch = !searchTerm ||
+      r.name.toLowerCase().includes(searchTerm) ||
+      r.desc.toLowerCase().includes(searchTerm) ||
+      r.category.toLowerCase().includes(searchTerm) ||
+      r.region.toLowerCase().includes(searchTerm) ||
+      r.ingredients.some(i => i.name.toLowerCase().includes(searchTerm));
+    return matchCat && matchSearch;
+  });
+}
+
+function diffClass(d) {
+  return d === "Easy" ? "diff-easy" : d === "Medium" ? "diff-medium" : "diff-hard";
+}
+
+// Render cards
+function render() {
+  const filtered = getFiltered();
+  const rinfo = document.getElementById('rinfo');
+  const main = document.getElementById('main');
+
+  if (!filtered.length) {
+    rinfo.innerHTML = '';
+    main.innerHTML = activeFilter === "★ Favourites"
+      ? '<div class="empty-state"><h3>No favourites yet</h3><p>Tap the ♡ on any recipe card to save it here.</p></div>'
+      : '<div class="empty-state"><h3>Nothing found</h3><p>Try a different search — ingredient names work too!</p></div>';
+    return;
+  }
+
+  rinfo.innerHTML = 'Showing <b>' + filtered.length + '</b> of ' + RECIPES.length + ' Namibian recipes';
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+
+  filtered.forEach((r, i) => {
+    const isFav = favourites.has(r.id);
+    const c = document.createElement('div');
+    c.className = 'card';
+    c.style.animationDelay = (i * 0.05) + 's';
+    c.innerHTML =
+      '<div class="card-img-wrap"><img src="' + r.img + '" alt="' + r.name + '" loading="lazy"><div class="card-img-overlay"></div></div>' +
+      '<button class="fav-btn' + (isFav ? ' active' : '') + '" title="' + (isFav ? 'Remove' : 'Save') + '" onclick="toggleFav(event,' + r.id + ')">' + (isFav ? '♥' : '♡') + '</button>' +
+      '<div class="card-body">' +
+        '<div class="card-tag">' + r.category + '</div>' +
+        '<div class="card-title">' + r.name + '</div>' +
+        '<div class="card-meta">' +
+          '<div class="card-region">📍 ' + r.region + '</div>' +
+          '<div class="card-time">⏱ ' + r.time + '</div>' +
+        '</div>' +
+        '<span class="diff-badge ' + diffClass(r.difficulty) + '">' + r.difficulty + '</span>' +
+      '</div>';
+    c.querySelector('.card-img-wrap').onclick = () => openRecipe(r.id);
+    c.querySelector('.card-body').onclick = () => openRecipe(r.id);
+    grid.appendChild(c);
+  });
+
+  main.innerHTML = '';
+  main.appendChild(grid);
+}
+
+// Open recipe modal
+function openRecipe(id) {
+  const r = RECIPES.find(x => x.id === id);
+  const isFav = favourites.has(r.id);
+  const modal = document.getElementById('modal');
+  const inner = document.getElementById('modal-inner');
+
+  inner.innerHTML =
+    '<div class="modal-hero-wrap">' +
+      '<img class="modal-hero-img" src="' + r.img + '" alt="' + r.name + '">' +
+      '<div class="modal-hero-overlay"></div>' +
+      '<button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>' +
+      '<div class="modal-header-info">' +
+        '<div style="flex:1">' +
+          '<div class="modal-badges">' +
+            '<span class="mbadge mbadge-fire">' + r.category + '</span>' +
+            '<span class="mbadge mbadge-earth">' + r.region + '</span>' +
+          '</div>' +
+          '<div class="modal-title">' + r.name + '</div>' +
+        '</div>' +
+        '<button class="modal-fav-btn' + (isFav ? ' active' : '') + '" onclick="toggleFav(event,' + r.id + ')">' + (isFav ? '♥' : '♡') + '</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="modal-body">' +
+      '<p class="modal-desc">' + r.desc + '</p>' +
+      '<div class="modal-stats">' +
+        '<div class="stat-card"><div class="stat-val">' + r.time + '</div><div class="stat-lbl">Total Time</div></div>' +
+        '<div class="stat-card"><div class="stat-val">' + r.servings + '</div><div class="stat-lbl">Servings</div></div>' +
+        '<div class="stat-card"><div class="stat-val">' + r.difficulty + '</div><div class="stat-lbl">Difficulty</div></div>' +
+      '</div>' +
+      '<div class="section-head">🧺 Ingredients</div>' +
+      '<div class="ing-grid">' + r.ingredients.map(i =>
+        '<div class="ing-item"><div class="ing-dot"></div><span class="ing-qty">' + i.qty + '</span><span class="ing-name">' + i.name + '</span></div>'
+      ).join('') + '</div>' +
+      '<div class="section-head">📋 Instructions</div>' +
+      '<div class="steps-list">' + r.steps.map((s, i) =>
+        '<div class="step-item"><div class="step-num">' + (i + 1) + '</div><div>' + s + '</div></div>'
+      ).join('') + '</div>' +
+      '<div class="tip-box"><div class="tip-label">🌿 Chef\'s Tip</div>' + r.tip + '</div>' +
+    '</div>';
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function maybeClose(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+document.addEventListener('keydown', e => e.key === 'Escape' && closeModal());
+
+// Initial render
+render();
+</script>
+</body>
+</html>
